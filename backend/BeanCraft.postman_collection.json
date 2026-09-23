@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "BeanCraft API",
+    "description": "Run in order: Status -> Register (or Login) -> Beans. Register/Login save {{token}}; Create Bean saves {{beanId}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://rxaviery.duckdns.org" },
+    { "key": "token", "value": "" },
+    { "key": "beanId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Status (health check)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/status.php"
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (res.data && res.data.token) pm.collectionVariables.set('token', res.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan Dela Cruz\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": "{{baseUrl}}/register.php"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "if (res.data && res.data.token) pm.collectionVariables.set('token', res.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": "{{baseUrl}}/login.php"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "url": "{{baseUrl}}/logout.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Beans",
+      "item": [
+        {
+          "name": "List beans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "url": "{{baseUrl}}/beans.php"
+          }
+        },
+        {
+          "name": "Create bean",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (res.data && res.data.id) pm.collectionVariables.set('beanId', res.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Auth-Token", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pink Bourbon Thermal Shock\",\n  \"roaster\": \"Manhattan Coffee Roasters\",\n  \"origin\": \"Huila, Colombia\",\n  \"farm\": \"Finca El Paraiso\",\n  \"process_method\": \"Thermal Shock\",\n  \"roast_level\": \"Light\",\n  \"roast_date\": \"2026-09-10\",\n  \"altitude\": \"1,850 masl\",\n  \"tasting_notes\": \"Lychee, Rose, Strawberry\",\n  \"bag_weight_g\": 250,\n  \"price\": 24.00\n}"
+            },
+            "url": "{{baseUrl}}/beans.php"
+          }
+        },
+        {
+          "name": "Get bean",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "url": "{{baseUrl}}/beans.php?id={{beanId}}"
+          }
+        },
+        {
+          "name": "Update bean (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Auth-Token", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remaining_g\": 235,\n  \"rating\": 4.5,\n  \"cupping_notes\": \"Bright, floral, syrupy body.\"\n}"
+            },
+            "url": "{{baseUrl}}/beans.php?id={{beanId}}"
+          }
+        },
+        {
+          "name": "Update bean (POST fallback)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Auth-Token", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_method\": \"PUT\",\n  \"remaining_g\": 217\n}"
+            },
+            "url": "{{baseUrl}}/beans.php?id={{beanId}}"
+          }
+        },
+        {
+          "name": "Delete bean (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "url": "{{baseUrl}}/beans.php?id={{beanId}}"
+          }
+        },
+        {
+          "name": "Delete bean (POST fallback)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "url": "{{baseUrl}}/beans.php?id={{beanId}}&_method=DELETE"
+          }
+        }
+      ]
+    }
+  ]
+}
