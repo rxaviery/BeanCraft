@@ -1,12 +1,13 @@
-// Bean Details: everything about one bag, quick "log a dose" buttons that save
-// instantly, and the Edit / Delete actions.
+// Bean Details: everything about one bag, quick-adjust buttons that save
+// instantly, this bean's recent brews, and the Edit / Delete actions.
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { errorMessage, getBean, updateBean, type Bean } from '@/api/client';
+import { errorMessage, getBean, getBrews, updateBean, type Bean, type Brew } from '@/api/client';
 import { BeanThumb } from '@/components/BeanCard';
+import { BrewCard } from '@/components/BrewCard';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -26,6 +27,7 @@ export default function BeanDetailsScreen() {
   const insets = useSafeAreaInsets();
   const toast = useToast();
   const [bean, setBean] = useState<Bean | null>(null);
+  const [brews, setBrews] = useState<Brew[]>([]);
   const [error, setError] = useState('');
   const [adjusting, setAdjusting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -33,7 +35,9 @@ export default function BeanDetailsScreen() {
   const load = useCallback(async () => {
     setError('');
     try {
-      setBean(await getBean(Number(id)));
+      const [loadedBean, loadedBrews] = await Promise.all([getBean(Number(id)), getBrews(Number(id))]);
+      setBean(loadedBean);
+      setBrews(loadedBrews);
     } catch (e) {
       setError(errorMessage(e));
     }
@@ -105,14 +109,14 @@ export default function BeanDetailsScreen() {
         <Card>
           <Text style={type.label}>Stash balance</Text>
           <StockMeter bean={bean} />
-          <Text style={type.label}>Log today's dose</Text>
+          <Text style={type.label}>Quick adjust (no brew logged)</Text>
           <View style={styles.doses}>
             {DOSES.map((g) => (
               <DoseButton
                 key={g}
                 label={`−${g}g`}
                 disabled={adjusting || bean.remaining_g === 0}
-                onPress={() => setRemaining(Math.max(0, bean.remaining_g - g), `Logged a ${g}g dose.`)}
+                onPress={() => setRemaining(Math.max(0, bean.remaining_g - g), `Took ${g}g from the bag.`)}
               />
             ))}
             <DoseButton
@@ -122,6 +126,36 @@ export default function BeanDetailsScreen() {
               onPress={() => setRemaining(bean.bag_weight_g, 'Bag restocked to full.')}
             />
           </View>
+        </Card>
+
+        <Card>
+          <View style={styles.scoreRow}>
+            <Text style={type.label}>Recent brews</Text>
+            <Text style={type.caption}>
+              {brews.length} {brews.length === 1 ? 'brew' : 'brews'} logged
+            </Text>
+          </View>
+          {brews.length === 0 ? (
+            <Text style={type.body}>No brews with this bean yet. Log one to track your recipe.</Text>
+          ) : (
+            brews
+              .slice(0, 3)
+              .map((brew) => (
+                <BrewCard
+                  key={brew.id}
+                  brew={brew}
+                  showBean={false}
+                  onPress={() => router.push({ pathname: '/brew/[id]', params: { id: brew.id } })}
+                />
+              ))
+          )}
+          <Button
+            title="Log a Brew"
+            variant="secondary"
+            icon="coffee-outline"
+            disabled={bean.remaining_g === 0}
+            onPress={() => router.push({ pathname: '/brew/new', params: { beanId: bean.id } })}
+          />
         </Card>
 
         <Card>
