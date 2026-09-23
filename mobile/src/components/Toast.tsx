@@ -1,4 +1,5 @@
-// Short message that pops up above the tab bar and fades away.
+// Short message that pops up just below the header and fades away
+// (up top so it never covers the + button or a form's Save button).
 // Wrap the app in <ToastProvider>, then in any screen:
 //   const toast = useToast();
 //   toast('Bean deleted', 'success');
@@ -48,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {toast ? (
         <Animated.View
           pointerEvents="none"
-          style={[styles.toast, { bottom: insets.bottom + 84, opacity }]}
+          style={[styles.toast, { top: insets.top + 68, opacity }]}
           accessibilityLiveRegion="polite"
         >
           <Icon name={ICONS[toast.tone]} size={18} color={ICON_COLORS[toast.tone]} />
