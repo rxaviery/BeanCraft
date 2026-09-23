@@ -29,6 +29,25 @@ export type Bean = {
 // Fields the app may send when creating or updating a bean.
 export type BeanInput = Partial<Omit<Bean, 'id' | 'created_at' | 'updated_at'>>;
 
+export type Brew = {
+  id: number;
+  bean_id: number;
+  bean_name: string; // joined from beans, read-only
+  bean_roaster: string;
+  method: string; // "V60", "Espresso", ...
+  dose_g: number;
+  water_g: number | null;
+  brew_time_s: number | null;
+  water_temp_c: number | null;
+  grind: string | null;
+  rating: number | null; // 0-5 stars
+  notes: string | null;
+  brewed_at: string; // "YYYY-MM-DD HH:MM:SS"
+};
+
+// Fields the app may send. bean_id is only used when creating.
+export type BrewInput = Partial<Omit<Brew, 'id' | 'bean_name' | 'bean_roaster' | 'brewed_at'>>;
+
 type Session = { user: User; token: string };
 
 export class ApiError extends Error {
@@ -128,3 +147,14 @@ export const createBean = (bean: BeanInput) => request<Bean>('/beans.php', 'POST
 export const updateBean = (id: number, changes: BeanInput) => request<Bean>(`/beans.php?id=${id}`, 'PUT', changes);
 
 export const deleteBean = (id: number) => request<{ id: number }>(`/beans.php?id=${id}`, 'DELETE');
+
+// ---- Brews (CRUD). The server keeps the bean's remaining grams in sync. ----
+export const getBrews = (beanId?: number) => request<Brew[]>(beanId ? `/brews.php?bean_id=${beanId}` : '/brews.php');
+
+export const getBrew = (id: number) => request<Brew>(`/brews.php?id=${id}`);
+
+export const createBrew = (brew: BrewInput) => request<Brew>('/brews.php', 'POST', brew);
+
+export const updateBrew = (id: number, changes: BrewInput) => request<Brew>(`/brews.php?id=${id}`, 'PUT', changes);
+
+export const deleteBrew = (id: number) => request<{ id: number }>(`/brews.php?id=${id}`, 'DELETE');

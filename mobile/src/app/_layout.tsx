@@ -52,6 +52,8 @@ function Screens() {
         <Stack.Screen name="bean/new" />
         <Stack.Screen name="bean/[id]/index" />
         <Stack.Screen name="bean/[id]/edit" />
+        <Stack.Screen name="brew/new" />
+        <Stack.Screen name="brew/[id]" />
       </Stack.Protected>
 
       <Stack.Protected guard={user === null}>
