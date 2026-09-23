@@ -113,13 +113,7 @@ function find_bean($id, $userId)
 $user = require_user();
 $method = request_method();
 
-$id = null;
-if (isset($_GET['id'])) {
-    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    if ($id === false) {
-        fail(400, 'Invalid bean id.');
-    }
-}
+$id = id_param('id');
 if (($method === 'PUT' || $method === 'DELETE') && $id === null) {
     fail(400, 'Add ?id=N to the URL.');
 }

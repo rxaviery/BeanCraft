@@ -74,6 +74,19 @@ function require_method($method)
     }
 }
 
+// A positive whole number from the URL (e.g. ?id=5), null if absent, 400 if invalid.
+function id_param($key)
+{
+    if (!isset($_GET[$key])) {
+        return null;
+    }
+    $id = filter_var($_GET[$key], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id === false) {
+        fail(400, "Invalid $key.");
+    }
+    return $id;
+}
+
 // Token from "X-Auth-Token: <t>" or "Authorization: Bearer <t>".
 function auth_token()
 {

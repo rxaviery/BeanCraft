@@ -35,3 +35,24 @@ CREATE TABLE beans (
   CONSTRAINT chk_remaining  CHECK (remaining_g <= bag_weight_g),
   CONSTRAINT chk_rating     CHECK (rating BETWEEN 0 AND 5)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Brew journal. Deleting a bean (or user) deletes its brews too.
+CREATE TABLE brews (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id      INT UNSIGNED NOT NULL,
+  bean_id      INT UNSIGNED NOT NULL,
+  method       VARCHAR(50)  NOT NULL,           -- e.g. "V60", "AeroPress"
+  dose_g       DECIMAL(4,1) NOT NULL,           -- dry coffee, grams
+  water_g      INT UNSIGNED NULL,               -- water / yield, grams
+  brew_time_s  INT UNSIGNED NULL,               -- seconds
+  water_temp_c TINYINT UNSIGNED NULL,
+  grind        VARCHAR(50)  NULL,               -- e.g. "22 clicks"
+  rating       DECIMAL(2,1) NULL,               -- 0.0-5.0 stars
+  notes        TEXT NULL,
+  brewed_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_brews_user (user_id, brewed_at),
+  CONSTRAINT fk_brews_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  CONSTRAINT fk_brews_bean FOREIGN KEY (bean_id) REFERENCES beans (id) ON DELETE CASCADE,
+  CONSTRAINT chk_brew_dose   CHECK (dose_g > 0),
+  CONSTRAINT chk_brew_rating CHECK (rating BETWEEN 0 AND 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
