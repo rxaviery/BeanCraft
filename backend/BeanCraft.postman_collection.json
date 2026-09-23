@@ -1,13 +1,26 @@
 {
   "info": {
     "name": "BeanCraft API",
-    "description": "Run in order: Status -> Register (or Login) -> Beans. Register/Login save {{token}}; Create Bean saves {{beanId}}.",
+    "description": "Run in order: Status -> Register (or Login) -> Beans -> Brews. Register/Login save {{token}}; Create bean saves {{beanId}}; Create brew saves {{brewId}}.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://rxaviery.duckdns.org" },
-    { "key": "token", "value": "" },
-    { "key": "beanId", "value": "" }
+    {
+      "key": "baseUrl",
+      "value": "http://rxaviery.duckdns.org"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "beanId",
+      "value": ""
+    },
+    {
+      "key": "brewId",
+      "value": ""
+    }
   ],
   "item": [
     {
@@ -37,7 +50,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Juan Dela Cruz\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"secret123\"\n}"
@@ -62,7 +80,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"secret123\"\n}"
@@ -74,7 +97,12 @@
           "name": "Logout",
           "request": {
             "method": "POST",
-            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/logout.php"
           }
         }
@@ -87,7 +115,12 @@
           "name": "List beans",
           "request": {
             "method": "GET",
-            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/beans.php"
           }
         },
@@ -109,8 +142,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-Auth-Token", "value": "{{token}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -123,7 +162,12 @@
           "name": "Get bean",
           "request": {
             "method": "GET",
-            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/beans.php?id={{beanId}}"
           }
         },
@@ -132,8 +176,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-Auth-Token", "value": "{{token}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -147,8 +197,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-Auth-Token", "value": "{{token}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -161,7 +217,12 @@
           "name": "Delete bean (DELETE)",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/beans.php?id={{beanId}}"
           }
         },
@@ -169,8 +230,125 @@
           "name": "Delete bean (POST fallback)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "X-Auth-Token", "value": "{{token}}" }],
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/beans.php?id={{beanId}}&_method=DELETE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Brews",
+      "item": [
+        {
+          "name": "List brews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/brews.php"
+          }
+        },
+        {
+          "name": "List brews for one bean",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/brews.php?bean_id={{beanId}}"
+          }
+        },
+        {
+          "name": "Create brew (uses coffee from the bean)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (res.data && res.data.id) pm.collectionVariables.set('brewId', res.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bean_id\": \"{{beanId}}\",\n  \"method\": \"V60\",\n  \"dose_g\": 15,\n  \"water_g\": 250,\n  \"brew_time_s\": 165,\n  \"water_temp_c\": 93,\n  \"grind\": \"22 clicks\",\n  \"rating\": 4.5,\n  \"notes\": \"Bright and juicy.\"\n}"
+            },
+            "url": "{{baseUrl}}/brews.php"
+          }
+        },
+        {
+          "name": "Get brew",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/brews.php?id={{brewId}}"
+          }
+        },
+        {
+          "name": "Update brew (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dose_g\": 18,\n  \"rating\": 4\n}"
+            },
+            "url": "{{baseUrl}}/brews.php?id={{brewId}}"
+          }
+        },
+        {
+          "name": "Delete brew (puts coffee back)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Auth-Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/brews.php?id={{brewId}}"
           }
         }
       ]

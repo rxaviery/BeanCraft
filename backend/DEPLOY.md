@@ -46,6 +46,13 @@ so your password never gets committed.
 Also open the status URL in your **phone's browser**. If you see a page other than
 JSON, the host is changing API responses before they reach the app.
 
+## Updating a database that already exists
+
+`schema.sql` is for a fresh database. To add the brew journal to a database
+that already has `users` and `beans`, run only the `CREATE TABLE brews (...)`
+statement from the bottom of `schema.sql` in phpMyAdmin's **SQL** tab, then
+upload `brews.php` and the updated `helpers.php` and `beans.php`.
+
 ## Troubleshooting
 
 | Symptom | Likely cause |

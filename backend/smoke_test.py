@@ -70,8 +70,29 @@ status, res = call("POST", f"/beans.php?id={bean_id}", {"_method": "PUT", "remai
 check("POST _method=PUT", (status, res["data"]["remaining_g"]), (200, 217))
 
 check("other id -> 404", call("GET", "/beans.php?id=999999", token=token)[0], 404)
+
+# Brews: logging uses coffee from the bean (remaining is 217g here).
+def remaining():
+    return call("GET", f"/beans.php?id={bean_id}", token=token)[1]["data"]["remaining_g"]
+
+status, res = call("POST", "/brews.php", {"method": "V60", "dose_g": 0}, token)
+check("brew invalid -> 422", (status, sorted(res["data"]["errors"])), (422, ["bean_id", "dose_g"]))
+status, res = call("POST", "/brews.php", {"bean_id": bean_id, "method": "V60", "dose_g": 15, "water_g": 250, "brew_time_s": 165, "rating": 4}, token)
+check("brew create", (status, res["data"]["bean_name"], res["data"]["water_g"]), (201, "Pink Bourbon", 250))
+brew_id = res["data"]["id"]
+check("brew takes 15g", remaining(), 202)
+status, res = call("PUT", f"/brews.php?id={brew_id}", {"dose_g": 18, "bean_id": 999999}, token)
+check("brew update (bean can't change)", (status, res["data"]["dose_g"], res["data"]["bean_id"]), (200, 18.0, bean_id))
+check("dose change adjusts stock", remaining(), 199)
+status, res = call("GET", f"/brews.php?bean_id={bean_id}", token=token)
+check("brews for one bean", (status, len(res["data"])), (200, 1))
+check("brew delete", call("DELETE", f"/brews.php?id={brew_id}", token=token)[0], 200)
+check("delete puts coffee back", remaining(), 217)
+call("POST", "/brews.php", {"bean_id": bean_id, "method": "Espresso", "dose_g": 18}, token)
+
 check("delete via ?_method", call("POST", f"/beans.php?id={bean_id}&_method=DELETE", token=token)[0], 200)
 check("delete again -> 404", call("DELETE", f"/beans.php?id={bean_id}", token=token)[0], 404)
+check("deleting a bean deletes its brews", len(call("GET", "/brews.php", token=token)[1]["data"]), 0)
 check("wrong method -> 405", call("GET", "/login.php")[0], 405)
 
 check("logout", call("POST", "/logout.php", token=token)[0], 200)
