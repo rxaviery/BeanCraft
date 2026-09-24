@@ -13,6 +13,7 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Chip } from '@/components/Chip';
 import { DeleteConfirm } from '@/components/DeleteConfirm';
+import { PriceAroundWorld } from '@/components/PriceAroundWorld';
 import { StarRating } from '@/components/StarRating';
 import { Loading, Message } from '@/components/StateView';
 import { StockMeter } from '@/components/StockMeter';
@@ -106,6 +107,8 @@ export default function BeanDetailsScreen() {
             </View>
           </View>
         </Card>
+
+        <PriceAroundWorld pesos={bean.price} />
 
         <Card>
           <Text style={type.label}>Stash balance</Text>
