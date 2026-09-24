@@ -1,7 +1,7 @@
 // Labeled text input with an optional icon and error message.
 // Passing secureTextEntry adds a show/hide password button.
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps, type TextStyle } from 'react-native';
 
 import { Icon, type IconName } from './Icon';
 import { colors, fonts, radius, spacing, type } from '@/theme/tokens';
@@ -23,7 +23,7 @@ export function TextField({ label, error, icon, secureTextEntry, multiline, onFo
         {icon ? <Icon name={icon} size={18} color={colors.textSubtle} /> : null}
         <TextInput
           {...input}
-          style={[styles.input, multiline && styles.inputMultiline, style]}
+          style={[styles.input, noFocusRing, multiline && styles.inputMultiline, style]}
           placeholderTextColor={colors.textSubtle}
           secureTextEntry={hidden}
           multiline={multiline}
@@ -53,6 +53,10 @@ export function TextField({ label, error, icon, secureTextEntry, multiline, onFo
   );
 }
 
+// Web only: hide the browser's black focus ring (the box border shows focus
+// instead). 'none' works on web but isn't in React Native's types, hence the cast.
+const noFocusRing = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null;
+
 const styles = StyleSheet.create({
   wrap: { gap: 6 },
   box: {
@@ -71,6 +75,7 @@ const styles = StyleSheet.create({
   boxError: { borderColor: colors.danger },
   input: {
     flex: 1,
+    minWidth: 0, // web inputs have a built-in minimum width that overflows narrow boxes
     paddingVertical: spacing.md,
     fontFamily: fonts.regular,
     fontSize: 15,
