@@ -27,7 +27,7 @@ export default function BeanDetailsScreen() {
   const insets = useSafeAreaInsets();
   const toast = useToast();
   const [bean, setBean] = useState<Bean | null>(null);
-  const [brews, setBrews] = useState<Brew[]>([]);
+  const [brews, setBrews] = useState<Brew[] | null>([]); // null = brews couldn't load
   const [error, setError] = useState('');
   const [adjusting, setAdjusting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -35,7 +35,8 @@ export default function BeanDetailsScreen() {
   const load = useCallback(async () => {
     setError('');
     try {
-      const [loadedBean, loadedBrews] = await Promise.all([getBean(Number(id)), getBrews(Number(id))]);
+      // A brews failure shouldn't hide the bean, so it only affects that section.
+      const [loadedBean, loadedBrews] = await Promise.all([getBean(Number(id)), getBrews(Number(id)).catch(() => null)]);
       setBean(loadedBean);
       setBrews(loadedBrews);
     } catch (e) {
@@ -131,11 +132,15 @@ export default function BeanDetailsScreen() {
         <Card>
           <View style={styles.scoreRow}>
             <Text style={type.label}>Recent brews</Text>
-            <Text style={type.caption}>
-              {brews.length} {brews.length === 1 ? 'brew' : 'brews'} logged
-            </Text>
+            {brews ? (
+              <Text style={type.caption}>
+                {brews.length} {brews.length === 1 ? 'brew' : 'brews'} logged
+              </Text>
+            ) : null}
           </View>
-          {brews.length === 0 ? (
+          {brews === null ? (
+            <Text style={type.body}>Couldn't load brews right now. Pull back and reopen to try again.</Text>
+          ) : brews.length === 0 ? (
             <Text style={type.body}>No brews with this bean yet. Log one to track your recipe.</Text>
           ) : (
             brews
